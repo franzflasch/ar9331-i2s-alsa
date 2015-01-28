@@ -1,0 +1,24 @@
+config AR9331_PCM
+	tristate "ar9331 pcm driver"
+	help
+	  ar9331 pcm driver
+
+config AR9331_I2S
+	tristate "ar9331 i2s driver"
+	help
+	  ar9331 i2s driver
+
+config AR9331_I2S_DEV
+	tristate "ar9331 i2s dev"
+	help
+	  ar9331 i2s audio dev
+
+config AR9331_WM8727
+	tristate "ar9331 wm8727"
+	help
+	  ar9331 i2s wm8727 codec
+
+config AR9331_CARAMBOLA2
+	tristate "ar9331 carambola2"
+	help
+	  ar9331 carambola2 audio clue code		  
