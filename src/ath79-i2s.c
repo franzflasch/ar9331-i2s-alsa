@@ -145,11 +145,14 @@ static int ath79_i2s_hw_params(struct snd_pcm_substream *substream,
 	printk("%s\n", __FUNCTION__);
 
 	/* find right frequency setting: */
-	for(clk_cfg_idx=0;clk_cfg_idx<(sizeof(clk_cfg)/(sizeof(struct ath79_snd_clk_config)));clk_cfg_idx++)
+	for(clk_cfg_idx=0;clk_cfg_idx<clk_cfg_array_size;clk_cfg_idx++)
 	{
 		if(params_rate(params) == clk_cfg[clk_cfg_idx].freq)
 		{
-			printk(KERN_NOTICE "Set clk config: %x-%x-%x for freq: %d\n", clk_cfg[clk_cfg_idx].divint, clk_cfg[clk_cfg_idx].divfrac, clk_cfg[clk_cfg_idx].posedgde, clk_cfg[clk_cfg_idx].freq);
+			printk(KERN_NOTICE "Set clk config: %x-%x-%x for freq: %d\n", clk_cfg[clk_cfg_idx].divint,
+																		  clk_cfg[clk_cfg_idx].divfrac,
+																		  clk_cfg[clk_cfg_idx].posedgde,
+																		  clk_cfg[clk_cfg_idx].freq);
 			break;
 		}
 	}
