@@ -16,10 +16,7 @@
 #include <asm/mach-ath79/ath79.h>
 
 #include "dev-audio.h"
-#include "ath79-i2s.h"
-
-#define AR934X_DMA_BASE		(AR71XX_APB_BASE + 0x000A0000)
-#define AR934X_DMA_SIZE		0x6C
+#include "ath79-stereo-regs.h"
 
 void __iomem *ath79_dma_io_base;
 EXPORT_SYMBOL_GPL(ath79_dma_io_base);

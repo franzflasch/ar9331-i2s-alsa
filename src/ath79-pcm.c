@@ -29,6 +29,7 @@
 #include <sound/soc.h>
 #include <sound/pcm_params.h>
 
+#include "ath79-stereo-regs.h"
 #include "ath79-pcm.h"
 
 #define  DRV_NAME	"ath79-pcm-audio"

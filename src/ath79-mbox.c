@@ -24,6 +24,7 @@
 #include <asm/mach-ath79/ar71xx_regs.h>
 #include <asm/mach-ath79/ath79.h>
 
+#include "ath79-stereo-regs.h"
 #include "ath79-pcm.h"
 #include "ath79-i2s.h"
 

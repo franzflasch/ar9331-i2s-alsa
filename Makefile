@@ -28,7 +28,7 @@ endef
 define KernelPackage/ath79-pcm
 	SUBMENU:=i2s alsa modules
 	TITLE:=Atheros 933X PCM module
-	DEPENDS:=@AUDIO_SUPPORT +kmod-sound-soc-core +kmod-ath79-i2s-dev
+	DEPENDS:=@AUDIO_SUPPORT +kmod-sound-soc-core +kmod-ath79-i2s +kmod-ath79-i2s-dev
 	FILES:=$(PKG_BUILD_DIR)/ath79-pcm-mbox.ko
 	KCONFIG:=
 endef
@@ -40,7 +40,7 @@ endef
 define KernelPackage/ath79-i2s-dev
 	SUBMENU:=i2s alsa modules
 	TITLE:=Atheros 933X I2S DEV module
-	DEPENDS:=@AUDIO_SUPPORT +kmod-ath79-i2s
+	DEPENDS:=@AUDIO_SUPPORT
 	FILES:=$(PKG_BUILD_DIR)/dev-audio.ko
 	KCONFIG:=
 endef

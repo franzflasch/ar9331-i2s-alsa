@@ -26,60 +26,10 @@
 #include <asm/mach-ath79/ar71xx_regs.h>
 #include <asm/mach-ath79/ath79.h>
 
+#include "ath79-stereo-regs.h"
 #include "ath79-i2s.h"
 
 #define DRV_NAME	"ath79-i2s"
-
-
-/*
- * FIXME: Remove these ugly macros!
- *
- * */
-#include <linux/gpio.h>
-#include <../arch/mips/ath79/common.h>
-#include <../arch/mips/include/asm/mach-ath79/gpio.h>
-#include <linux/delay.h>
-
-typedef unsigned int ar7240_reg_t;
-
-#define ar7240_reg_rd(_phys)	(*(volatile ar7240_reg_t *)KSEG1ADDR(_phys))
-#define ar7240_reg_wr_nf(_phys, _val) \
-	((*(volatile ar7240_reg_t *)KSEG1ADDR(_phys)) = (_val))
-
-#define ar7240_reg_wr(_phys, _val) do {	\
-	ar7240_reg_wr_nf(_phys, _val);	\
-	ar7240_reg_rd(_phys);		\
-} while(0)
-
-#define ar7240_reg_rmw_set(_reg, _mask)	do {				\
-	ar7240_reg_wr((_reg), (ar7240_reg_rd((_reg)) | (_mask)));	\
-	ar7240_reg_rd((_reg));						\
-} while(0)
-
-#define ar7240_reg_rmw_clear(_reg, _mask) do {				\
-	ar7240_reg_wr((_reg), (ar7240_reg_rd((_reg)) & ~(_mask)));	\
-	ar7240_reg_rd((_reg));						\
-} while(0)
-
-#define AR7240_GPIO_FUNCTION_I2S_GPIO_18_22_EN		(1<<29)
-#define AR7240_GPIO_FUNCTION_I2S_REFCLKEN		(1<<28)
-#define AR7240_GPIO_FUNCTION_I2S_MCKEN			(1<<27)
-#define AR7240_GPIO_FUNCTION_I2S0_EN			(1<<26)
-
-#define AR7240_GPIO_FUNCTIONS (0x18000000+0x00040000+0x28)
-#define AR7240_GPIO_FUNCTION_2 (0x18000000+0x00040000+0x30)
-#define AR7240_GPIO_OE (0x18000000+0x00040000+0x00)
-
-#define AR7240_STEREO_CLK_DIV (0x18000000+0x000B0000+0x1c)
-#define AR7240_STEREO_CONFIG (0x18000000+0x000B0000+0x00)
-#define AR7240_STEREO_CONFIG_PSEDGE(x)			(0xff&x)
-
-#define I2S_GPIOPIN_MIC					22
-#define I2S_GPIOPIN_WS					19
-#define I2S_GPIOPIN_SCK					18
-#define I2S_GPIOPIN_SD					20
-#define I2S_GPIOPIN_OMCLK				21
-
 
 
 DEFINE_SPINLOCK(ath79_stereo_lock);
@@ -162,7 +112,8 @@ static int ath79_i2s_hw_params(struct snd_pcm_substream *substream,
 		printk(KERN_ERR "No valid clock config found for frequency %d\n", params_rate(params));
 		return -ENOTSUPP;
 	}
-	ar7240_reg_wr(AR7240_STEREO_CLK_DIV, ((clk_cfg[clk_cfg_idx].divint << 16) + clk_cfg[clk_cfg_idx].divfrac));
+	//ar7240_reg_wr(AR7240_STEREO_CLK_DIV, ((clk_cfg[clk_cfg_idx].divint << 16) + clk_cfg[clk_cfg_idx].divfrac));
+	ath79_stereo_wr(AR934X_STEREO_CONFIG_CLK_DIV, ((clk_cfg[clk_cfg_idx].divint << 16) + clk_cfg[clk_cfg_idx].divfrac));
 
 	switch(params_format(params)) 
 	{
@@ -185,7 +136,7 @@ static int ath79_i2s_hw_params(struct snd_pcm_substream *substream,
 		<< AR934X_STEREO_CONFIG_DATA_WORD_SIZE_SHIFT);
 	t &= ~(AR934X_STEREO_CONFIG_I2S_WORD_SIZE);
 	t |= mask;
-	t |= AR7240_STEREO_CONFIG_PSEDGE(2);
+	t |= AR934X_STEREO_CONFIG_PSEDGE(2);
 	ath79_stereo_wr(AR934X_STEREO_REG_CONFIG, t);
 	spin_unlock(&ath79_stereo_lock);
 
@@ -230,25 +181,6 @@ static int ath79_i2s_drv_probe(struct platform_device *pdev)
 {
 	printk("%s\n", __FUNCTION__);
 	spin_lock_init(&ath79_stereo_lock);
-
-	/*
-	 * FIXME: Beautify this!
-	 *
-	 * */
-    ar7240_reg_rmw_set(AR7240_GPIO_FUNCTIONS, (AR7240_GPIO_FUNCTION_I2S_GPIO_18_22_EN |
-    										   AR7240_GPIO_FUNCTION_I2S_MCKEN |
-											   AR7240_GPIO_FUNCTION_I2S0_EN
-											   /* | AR7240_GPIO_FUNCTION_JTAG_DISABLE */));
-
-	/* Enable the SPDIF output on GPIO23 */
-    ar7240_reg_rmw_set(AR7240_GPIO_FUNCTION_2, (1<<2));
-	// Set GPIO_OE
-    ar7240_reg_rmw_set(AR7240_GPIO_OE, (1<<I2S_GPIOPIN_SCK) |
-    								   (1<<I2S_GPIOPIN_WS) |
-									   (1<<I2S_GPIOPIN_SD) |
-									   (1<<I2S_GPIOPIN_OMCLK));
-    ar7240_reg_rmw_clear(AR7240_GPIO_OE, (1<<I2S_GPIOPIN_MIC));
-
 
 	ath79_stereo_reset();
 	return snd_soc_register_component(&pdev->dev, &ath79_i2s_component, &ath79_i2s_dai, 1);
